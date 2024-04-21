@@ -4,7 +4,6 @@
 #include "SynthVoice.h"
 #include <juce_core/juce_core.h>
 
-
 NewProjectAudioProcessor::NewProjectAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
     : AudioProcessor(BusesProperties()
@@ -18,9 +17,16 @@ NewProjectAudioProcessor::NewProjectAudioProcessor()
       mixParameter(new juce::AudioParameterFloat("mix", "Mix", 0.0f, 1.0f, 0.5f))
 #endif
 {
-    addParameter(mixParameter.get());
+    try {
+        addParameter(mixParameter.get());
+    } catch (const std::exception& e) {
+        DBG("Exception adding parameter: " + juce::String(e.what()));
+    }
+
     scanSamplesDirectory("/Volumes/Macintosh HD/Users/denisfalencik/desktop/XCODE/TRIAL/NewProject/SAMPLES");
 }
+
+
 
 NewProjectAudioProcessor::~NewProjectAudioProcessor() {}
 
