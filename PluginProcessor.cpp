@@ -4,34 +4,25 @@
 #include "SynthVoice.h"
 #include <juce_core/juce_core.h>
 
+
+
 NewProjectAudioProcessor::NewProjectAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-    : AudioProcessor(BusesProperties()
-#if ! JucePlugin_IsMidiEffect
-#if ! JucePlugin_IsSynth
-        .withInput("Input", juce::AudioChannelSet::stereo(), true)
-#endif
-        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
-#endif
-    ),
-      mixParameter(new juce::AudioParameterFloat("mix", "Mix", 0.0f, 1.0f, 0.5f))
-#endif
+    : AudioProcessor(BusesProperties().withInput("Input", juce::AudioChannelSet::stereo(), true).withOutput("Output", juce::AudioChannelSet::stereo(), true)),
+      mixParameter(std::make_unique<juce::AudioParameterFloat>("mix", "Mix", 0.0f, 1.0f, 0.5f))
 {
     try {
         addParameter(mixParameter.get());
     } catch (const std::exception& e) {
-        DBG("Exception adding parameter: " + juce::String(e.what()));
+        DBG("Failed to initialize mixParameter: " + juce::String(e.what()));
+        // Handle initialization failure (e.g., fallback to a default value)
     }
 
-    scanSamplesDirectory("/Volumes/Macintosh HD/Users/denisfalencik/desktop/XCODE/TRIAL/NewProject/SAMPLES");
-}
-
-
-
-NewProjectAudioProcessor::~NewProjectAudioProcessor() {}
-
-const juce::String NewProjectAudioProcessor::getName() const {
-    return JucePlugin_Name;
+    juce::File sampleDir("/Volumes/Macintosh HD/Users/denisfalencik/desktop/XCODE/TRIAL/NewProject/SAMPLES");
+    if (sampleDir.exists() && sampleDir.isDirectory()) {
+        scanSamplesDirectory(sampleDir.getFullPathName());
+    } else {
+        DBG("Sample directory does not exist: " + sampleDir.getFullPathName());
+    }
 }
 
 bool NewProjectAudioProcessor::acceptsMidi() const {
