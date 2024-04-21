@@ -44,14 +44,18 @@ int SynthVoice::getNoteNumber() const {
 
 float SynthVoice::getNextSample() {
     float sample = 0.0f;
-    for (int i = 0; i < unisonSize; ++i) {
-        int index = static_cast<int>(currentSampleIndex * detuneOffsets[i]) % wavetableSize;
-        sample += wavetable[currentWaveform][index];
-        currentSampleIndex += increment;
-        if (currentSampleIndex >= wavetableSize) currentSampleIndex -= wavetableSize;
+    if (active) {
+        for (int i = 0; i < unisonSize; ++i) {
+            float detuneFactor = detuneOffsets.size() > i ? detuneOffsets[i] : 1.0f;
+            int index = static_cast<int>(fmod(currentSampleIndex * detuneFactor, wavetableSize));
+            sample += wavetable[currentWaveform][index];
+            currentSampleIndex += increment;
+            if (currentSampleIndex >= wavetableSize) currentSampleIndex -= wavetableSize;
+        }
     }
     return sample / unisonSize;
 }
+
 
 bool SynthVoice::isActive() const {
     return active;
