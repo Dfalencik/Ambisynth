@@ -14,16 +14,22 @@
         DBG("Failed to initialize mixParameter: " + juce::String(e.what()));
         // Handle initialization failure (e.g., fallback to a default value)
     }
-    scanSamplesDirectory("/Volumes/Macintosh HD/Users/denisfalencik/desktop/XCODE/TRIAL/NewProject/SAMPLES");
-}
-}
+mixParameter(std::make_unique<juce::AudioParameterFloat>("mix", "Mix", 0.0f, 1.0f, 0.5f))
+{
+    // Ensure parameter is valid before adding
+    if (mixParameter != nullptr) {
+        addParameter(mixParameter.get());
+    } else {
+        DBG("Failed to initialize mixParameter");
+    }
 
-NewProjectAudioProcessor::~NewProjectAudioProcessor() {}
-
-const juce::String NewProjectAudioProcessor::getName() const {
-    return JucePlugin_Name;
+    juce::File sampleDir("/Volumes/Macintosh HD/Users/denisfalencik/desktop/XCODE/TRIAL/NewProject/SAMPLES");
+    if (sampleDir.exists() && sampleDir.isDirectory()) {
+        scanSamplesDirectory(sampleDir.getFullPathName());
+    } else {
+        DBG("Sample directory does not exist: " + sampleDir.getFullPathName());
+    }
 }
-
 bool NewProjectAudioProcessor::acceptsMidi() const {
     return true;
 }
