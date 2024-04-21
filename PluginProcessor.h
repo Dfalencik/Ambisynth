@@ -7,7 +7,7 @@
 class NewProjectAudioProcessor : public juce::AudioProcessor {
 public:
     NewProjectAudioProcessor();
-    ~NewProjectAudioProcessor() override;
+    virtual ~NewProjectAudioProcessor() override;
 
     void prepareToPlay(double sampleRate, int asamplesPerBlock) override;
     void releaseResources() override;
