@@ -26,10 +26,13 @@ void WavetableSynthesizer::prepareToPlay(double sampleRate, int samplesPerBlock)
 float WavetableSynthesizer::getNextSample() {
     float output = 0.0f;
     for (auto& voice : voices) {
-        output += voice->getNextSample();  // Summing outputs from all voices
+        if (voice->isActive()) {
+            output += voice->getNextSample();
+        }
     }
     return output;
 }
+
 
 
 void WavetableSynthesizer::releaseResources() {}
